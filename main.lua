@@ -199,15 +199,32 @@ logoStroke.Thickness = 1.5
 logoStroke.Transparency = 0.5
 logoStroke.Parent = logoCircle
 
--- Using the provided asset ID for the logo
+-- Try loading image from the provided asset ID, fallback to default if fails
 local logoIcon = Instance.new("ImageLabel")
 logoIcon.Size = UDim2.new(0, 24, 0, 24)
 logoIcon.Position = UDim2.new(0.5, -12, 0.5, -12)
 logoIcon.BackgroundTransparency = 1
-logoIcon.Image = "rbxassetid://76444088503397"  -- Provided asset ID
 logoIcon.ImageColor3 = UI_CONFIG.PrimaryColor
 logoIcon.ScaleType = Enum.ScaleType.Fit
 logoIcon.Parent = logoCircle
+
+-- Attempt to set the image and handle failure gracefully
+local success, errorMessage = pcall(function()
+    logoIcon.Image = "@logo_seamless.png"  -- Provided local asset reference
+end)
+
+-- If image fails to load, use a default Roblox asset
+if not success then
+    -- Try alternative URL format if GitHub URL is accessible
+    local urlSuccess, urlErrorMessage = pcall(function()
+        logoIcon.Image = "https://raw.githubusercontent.com/Bloxhouse/bloxhouse-fishit-gifting-script/refs/heads/main/logo_seamless.png"
+    end)
+
+    -- If GitHub URL also fails, use default fallback
+    if not urlSuccess then
+        logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as fallback
+    end
+end
 
 -- Title with gradient effect
 local titleLabel = Instance.new("TextLabel")
