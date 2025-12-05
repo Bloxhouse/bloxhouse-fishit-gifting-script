@@ -231,44 +231,55 @@ notificationLabel.Font = UI_CONFIG.Font
 notificationLabel.ZIndex = 10
 notificationLabel.Parent = notificationFrame
 
+-- Notification showing which logo is being attempted
+notificationLabel.Text = "🔍 Attempting to load logo: @logo_seamless.png"
+
 -- Attempt to set the image and handle failure gracefully with notifications
 local success, errorMessage = pcall(function()
     logoIcon.Image = "@logo_seamless.png"  -- Provided local asset reference
-    notificationLabel.Text = "✅ Logo loaded: @logo_seamless.png"
+    notificationLabel.Text = "✅ Logo loaded: @logo_seamless.png (Local Asset)"
 end)
 
 -- If first attempt fails, try GitHub URL
 if not success then
-    -- Update notification
+    -- Update notification to show what failed
     notificationLabel.Text = "⚠️ Local asset failed, trying GitHub URL..."
+
+    wait(1) -- Pause to allow user to see the status
 
     local urlSuccess, urlErrorMessage = pcall(function()
         logoIcon.Image = "https://raw.githubusercontent.com/Bloxhouse/bloxhouse-fishit-gifting-script/refs/heads/main/logo_seamless.png"
-        notificationLabel.Text = "✅ Logo loaded: GitHub URL"
+        notificationLabel.Text = "✅ Logo loaded: GitHub Raw URL"
     end)
 
     -- If GitHub URL also fails, use default fallback
     if not urlSuccess then
-        notificationLabel.Text = "⚠️ GitHub URL failed, using default..."
+        notificationLabel.Text = "⚠️ GitHub URL failed, using default asset..."
+
+        wait(1) -- Pause to allow user to see the status
 
         local defaultSuccess, defaultError = pcall(function()
             logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as fallback
-            notificationLabel.Text = "✅ Logo loaded: Default asset"
+            notificationLabel.Text = "✅ Logo loaded: Roblox Default Asset"
         end)
 
         if not defaultSuccess then
-            notificationLabel.Text = "❌ All logo attempts failed"
+            notificationLabel.Text = "❌ All logo attempts failed - using fallback"
         end
+    else
+        notificationLabel.Text = "✅ Success: GitHub Raw URL loaded"
     end
+else
+    notificationLabel.Text = "✅ Success: Local asset loaded"
 end
 
--- Auto-hide notification after 5 seconds
+-- Keep notification visible for 10 seconds so user can see which logo loaded
 spawn(function()
-    wait(5)
-    TweenService:Create(notificationFrame, TweenInfo.new(0.5), {
-        Position = UDim2.new(0.5, -150, 0, -60)
+    wait(10)
+    TweenService:Create(notificationFrame, TweenInfo.new(1), {
+        Position = UDim2.new(0.5, -150, 0, -100)
     }):Play()
-    wait(0.5)
+    wait(1)
     notificationFrame:Destroy()
 end)
 
