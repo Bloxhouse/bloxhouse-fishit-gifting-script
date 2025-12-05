@@ -208,79 +208,116 @@ logoIcon.ImageColor3 = UI_CONFIG.PrimaryColor
 logoIcon.ScaleType = Enum.ScaleType.Fit
 logoIcon.Parent = logoCircle
 
--- Notification Frame
-local notificationFrame = Instance.new("Frame")
-notificationFrame.Size = UDim2.new(0, 300, 0, 50)
-notificationFrame.Position = UDim2.new(0.5, -150, 0, -60)
-notificationFrame.BackgroundColor3 = UI_CONFIG.TextColor
-notificationFrame.BackgroundTransparency = 0.9
-notificationFrame.BorderSizePixel = 0
-notificationFrame.ZIndex = 10
-notificationFrame.Parent = mainContainer
-local notificationCorner = Instance.new("UICorner")
-notificationCorner.CornerRadius = UDim.new(0, 8)
-notificationCorner.Parent = notificationFrame
+-- Logo Status Notification (Moved to bottom-right)
+local logoNotificationFrame = Instance.new("Frame")
+logoNotificationFrame.Size = UDim2.new(0, 300, 0, 50)
+logoNotificationFrame.Position = UDim2.new(1, -310, 1, -120)  -- Bottom-right position, lower than status
+logoNotificationFrame.BackgroundColor3 = UI_CONFIG.TextColor
+logoNotificationFrame.BackgroundTransparency = 0.9
+logoNotificationFrame.BorderSizePixel = 0
+logoNotificationFrame.ZIndex = 100  -- Higher z-index to ensure visibility
+logoNotificationFrame.Parent = screenGui  -- Attach to screenGui instead of mainContainer for consistent positioning
+local logoNotificationCorner = Instance.new("UICorner")
+logoNotificationCorner.CornerRadius = UDim.new(0, 8)
+logoNotificationCorner.Parent = logoNotificationFrame
 
-local notificationLabel = Instance.new("TextLabel")
-notificationLabel.Size = UDim2.new(1, 0, 1, 0)
-notificationLabel.BackgroundTransparency = 1
-notificationLabel.Text = ""
-notificationLabel.TextColor3 = UI_CONFIG.PrimaryColor
-notificationLabel.TextSize = 14
-notificationLabel.Font = UI_CONFIG.Font
-notificationLabel.ZIndex = 10
-notificationLabel.Parent = notificationFrame
+local logoNotificationLabel = Instance.new("TextLabel")
+logoNotificationLabel.Size = UDim2.new(1, 0, 1, 0)
+logoNotificationLabel.BackgroundTransparency = 1
+logoNotificationLabel.Text = ""
+logoNotificationLabel.TextColor3 = UI_CONFIG.PrimaryColor
+logoNotificationLabel.TextSize = 12
+logoNotificationLabel.Font = UI_CONFIG.Font
+logoNotificationLabel.ZIndex = 101  -- Higher z-index to ensure visibility
+logoNotificationLabel.TextScaled = true
+logoNotificationLabel.Parent = logoNotificationFrame
 
 -- Notification showing which logo is being attempted
-notificationLabel.Text = "🔍 Attempting to load logo: @logo_seamless.png"
+logoNotificationLabel.Text = "🔍 Attempting to load logo: @logo_seamless.png"
 
 -- Attempt to set the image and handle failure gracefully with notifications
 local success, errorMessage = pcall(function()
     logoIcon.Image = "@logo_seamless.png"  -- Provided local asset reference
-    notificationLabel.Text = "✅ Logo loaded: @logo_seamless.png (Local Asset)"
+    logoNotificationLabel.Text = "✅ Logo loaded: @logo_seamless.png (Local Asset)"
 end)
 
 -- If first attempt fails, try GitHub URL
 if not success then
     -- Update notification to show what failed
-    notificationLabel.Text = "⚠️ Local asset failed, trying GitHub URL..."
+    logoNotificationLabel.Text = "⚠️ Local asset failed, trying GitHub URL..."
 
     wait(1) -- Pause to allow user to see the status
 
     local urlSuccess, urlErrorMessage = pcall(function()
         logoIcon.Image = "https://raw.githubusercontent.com/Bloxhouse/bloxhouse-fishit-gifting-script/refs/heads/main/logo_seamless.png"
-        notificationLabel.Text = "✅ Logo loaded: GitHub Raw URL"
+        logoNotificationLabel.Text = "✅ Logo loaded: GitHub Raw URL"
     end)
 
     -- If GitHub URL also fails, use default fallback
     if not urlSuccess then
-        notificationLabel.Text = "⚠️ GitHub URL failed, using default asset..."
+        logoNotificationLabel.Text = "⚠️ GitHub URL failed, using default asset..."
 
         wait(1) -- Pause to allow user to see the status
 
         local defaultSuccess, defaultError = pcall(function()
             logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as fallback
-            notificationLabel.Text = "✅ Logo loaded: Roblox Default Asset"
+            logoNotificationLabel.Text = "✅ Logo loaded: Roblox Default Asset"
         end)
 
         if not defaultSuccess then
-            notificationLabel.Text = "❌ All logo attempts failed - using fallback"
+            logoNotificationLabel.Text = "❌ All logo attempts failed - using fallback"
         end
     else
-        notificationLabel.Text = "✅ Success: GitHub Raw URL loaded"
+        logoNotificationLabel.Text = "✅ Success: GitHub Raw URL loaded"
     end
 else
-    notificationLabel.Text = "✅ Success: Local asset loaded"
+    logoNotificationLabel.Text = "✅ Success: Local asset loaded"
 end
 
 -- Keep notification visible for 10 seconds so user can see which logo loaded
 spawn(function()
     wait(10)
-    TweenService:Create(notificationFrame, TweenInfo.new(1), {
-        Position = UDim2.new(0.5, -150, 0, -100)
+    TweenService:Create(logoNotificationFrame, TweenInfo.new(0.8), {
+        Position = UDim2.new(1, -0, 1, -120)
     }):Play()
-    wait(1)
-    notificationFrame:Destroy()
+    wait(0.8)
+    logoNotificationFrame:Destroy()
+end)
+
+-- Script Status Notification (Bottom-right)
+local statusNotificationFrame = Instance.new("Frame")
+statusNotificationFrame.Size = UDim2.new(0, 280, 0, 40)
+statusNotificationFrame.Position = UDim2.new(1, -290, 1, -180)  -- Bottom-right position, above logo notification
+statusNotificationFrame.BackgroundColor3 = Color3.fromRGB(34, 197, 94)  -- Professional green for success status
+statusNotificationFrame.BackgroundTransparency = 0.8
+statusNotificationFrame.BorderSizePixel = 0
+statusNotificationFrame.ZIndex = 100  -- Higher z-index to ensure visibility
+statusNotificationFrame.Parent = screenGui  -- Attach to screenGui instead of mainContainer for consistent positioning
+local statusNotificationCorner = Instance.new("UICorner")
+statusNotificationCorner.CornerRadius = UDim.new(0, 8)
+statusNotificationCorner.Parent = statusNotificationFrame
+
+local statusNotificationLabel = Instance.new("TextLabel")
+statusNotificationLabel.Size = UDim2.new(1, -10, 1, 0)
+statusNotificationLabel.Position = UDim2.new(0, 5, 0, 0)
+statusNotificationLabel.BackgroundTransparency = 1
+statusNotificationLabel.Text = "✅ Script is running - FishIt UI Active"
+statusNotificationLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+statusNotificationLabel.TextSize = 12
+statusNotificationLabel.Font = UI_CONFIG.Font
+statusNotificationLabel.ZIndex = 101  -- Higher z-index to ensure visibility
+statusNotificationLabel.TextScaled = true
+statusNotificationLabel.TextXAlignment = Enum.TextXAlignment.Left
+statusNotificationLabel.Parent = statusNotificationFrame
+
+-- Auto hide the status notification after 8 seconds
+spawn(function()
+    wait(8)
+    TweenService:Create(statusNotificationFrame, TweenInfo.new(0.8), {
+        Position = UDim2.new(1, -0, 1, -180)
+    }):Play()
+    wait(0.8)
+    statusNotificationFrame:Destroy()
 end)
 
 -- Title with gradient effect
