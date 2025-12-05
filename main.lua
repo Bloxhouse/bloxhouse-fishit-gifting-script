@@ -199,11 +199,12 @@ logoStroke.Thickness = 1.5
 logoStroke.Transparency = 0.5
 logoStroke.Parent = logoCircle
 
+-- Using the provided asset ID for the logo
 local logoIcon = Instance.new("ImageLabel")
 logoIcon.Size = UDim2.new(0, 24, 0, 24)
 logoIcon.Position = UDim2.new(0.5, -12, 0.5, -12)
 logoIcon.BackgroundTransparency = 1
-logoIcon.Image = "rbxassetid://6034842695"
+logoIcon.Image = "rbxassetid://76444088503397"  -- Provided asset ID
 logoIcon.ImageColor3 = UI_CONFIG.PrimaryColor
 logoIcon.Parent = logoCircle
 
