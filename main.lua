@@ -238,63 +238,69 @@ logoNotificationLabel.Font = UI_CONFIG.Font
 logoNotificationLabel.TextSize = 12
 logoNotificationLabel.TextWrapped = true
 
--- Try loading the GitHub URL first
-local gitSuccess, gitErrorMessage = pcall(function()
-    logoIcon.Image = "https://raw.githubusercontent.com/Bloxhouse/bloxhouse-fishit-gifting-script/refs/heads/main/logo_seamless.png"
-    logoNotificationLabel.Text = "✅ Logo loaded: GitHub Raw URL"
+-- First try to use Roblox asset IDs since GitHub URL doesn't render properly in Roblox
+local success, errorMessage = pcall(function()
+    logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as primary option
+    logoNotificationLabel.Text = "✅ Logo loaded: Roblox Default Circle"
     logoNotificationLabel.Font = UI_CONFIG.Font
     logoNotificationLabel.TextSize = 12
     logoNotificationLabel.TextWrapped = true
 end)
 
-if gitSuccess then
-    -- If GitHub URL loads successfully, update notification
-    logoNotificationLabel.Text = "✅ Logo loaded: GitHub Raw URL (Preferred)"
-    logoNotificationLabel.Font = UI_CONFIG.Font
-    logoNotificationLabel.TextSize = 12
-    logoNotificationLabel.TextWrapped = true
-else
-    -- If GitHub URL fails, try default Roblox asset
-    logoNotificationLabel.Text = "⚠️ GitHub URL failed, trying default asset..."
-    logoNotificationLabel.Font = UI_CONFIG.Font
-    logoNotificationLabel.TextSize = 12
-    logoNotificationLabel.TextWrapped = true
-
-    wait(1) -- Pause to allow user to see the status
-
-    local success, errorMessage = pcall(function()
-        logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as fallback
-        logoNotificationLabel.Text = "✅ Logo loaded: Default Roblox Asset"
+if success then
+    -- Check if the image is actually displaying
+    if logoIcon.Image ~= "" and logoIcon.Image ~= nil then
+        logoNotificationLabel.Text = "✅ Logo loaded: Roblox Default Circle (Confirmed)"
         logoNotificationLabel.Font = UI_CONFIG.Font
         logoNotificationLabel.TextSize = 12
         logoNotificationLabel.TextWrapped = true
-    end)
-
-    if not success then
-        -- If default asset also fails, try backup
-        logoNotificationLabel.Text = "⚠️ Default asset failed, using backup..."
-        logoNotificationLabel.Font = UI_CONFIG.Font
-        logoNotificationLabel.TextSize = 12
-        logoNotificationLabel.TextWrapped = true
-
-        wait(1) -- Pause to show status
-
+    else
+        -- Try another Roblox asset
         local backupSuccess, backupError = pcall(function()
             logoIcon.Image = "rbxassetid://6035062920"  -- Backup circle icon
-            logoNotificationLabel.Text = "✅ Logo loaded: Backup Asset"
+            logoNotificationLabel.Text = "✅ Logo loaded: Backup Circle Asset"
             logoNotificationLabel.Font = UI_CONFIG.Font
             logoNotificationLabel.TextSize = 12
             logoNotificationLabel.TextWrapped = true
         end)
 
         if not backupSuccess then
-            -- Ultimate fallback to ensure something shows
-            logoNotificationLabel.Text = "❌ All logo attempts failed - using Roblox default"
+            -- Last resort - simple circle with color
+            logoNotificationLabel.Text = "⚠️ All image assets failed, using color fill..."
             logoNotificationLabel.Font = UI_CONFIG.Font
             logoNotificationLabel.TextSize = 12
             logoNotificationLabel.TextWrapped = true
-            logoIcon.Image = "rbxassetid://6034842695"  -- Ultimate fallback
+
+            -- Just keep the logo circle with color but no image
+            logoIcon.Visible = false
+            wait(2)
+            logoNotificationLabel.Text = "✅ Logo fallback: Color circle (No Image)"
         end
+    end
+else
+    -- If default asset fails, try backup Roblox asset
+    logoNotificationLabel.Text = "⚠️ Default asset failed, trying backup asset..."
+    logoNotificationLabel.Font = UI_CONFIG.Font
+    logoNotificationLabel.TextSize = 12
+    logoNotificationLabel.TextWrapped = true
+
+    wait(1) -- Pause to allow user to see the status
+
+    local backupSuccess, backupError = pcall(function()
+        logoIcon.Image = "rbxassetid://6035062920"  -- Backup circle icon
+        logoNotificationLabel.Text = "✅ Logo loaded: Backup Asset"
+        logoNotificationLabel.Font = UI_CONFIG.Font
+        logoNotificationLabel.TextSize = 12
+        logoNotificationLabel.TextWrapped = true
+    end)
+
+    if not backupSuccess then
+        -- Ultimate fallback to ensure something shows
+        logoNotificationLabel.Text = "❌ All logo attempts failed - using Roblox default"
+        logoNotificationLabel.Font = UI_CONFIG.Font
+        logoNotificationLabel.TextSize = 12
+        logoNotificationLabel.TextWrapped = true
+        logoIcon.Image = "rbxassetid://6034842695"  -- Ultimate fallback
     end
 end
 
