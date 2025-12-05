@@ -238,53 +238,47 @@ logoNotificationLabel.Font = UI_CONFIG.Font
 logoNotificationLabel.TextSize = 12
 logoNotificationLabel.TextWrapped = true
 
--- Try loading the default Roblox asset first since @ format doesn't work
-local success, errorMessage = pcall(function()
-    logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as fallback
-    logoNotificationLabel.Text = "✅ Logo loaded: Default Roblox Asset"
+-- Try loading the GitHub URL first
+local gitSuccess, gitErrorMessage = pcall(function()
+    logoIcon.Image = "https://raw.githubusercontent.com/Bloxhouse/bloxhouse-fishit-gifting-script/refs/heads/main/logo_seamless.png"
+    logoNotificationLabel.Text = "✅ Logo loaded: GitHub Raw URL"
     logoNotificationLabel.Font = UI_CONFIG.Font
     logoNotificationLabel.TextSize = 12
     logoNotificationLabel.TextWrapped = true
 end)
 
--- If default asset loads successfully, try the GitHub URL as an upgrade
-if success then
-    -- Try to load GitHub version as an enhancement
-    local gitSuccess, gitErrorMessage = pcall(function()
-        logoIcon.Image = "https://raw.githubusercontent.com/Bloxhouse/bloxhouse-fishit-gifting-script/refs/heads/main/logo_seamless.png"
-        logoNotificationLabel.Text = "✅ Logo upgraded: GitHub Raw URL"
-        logoNotificationLabel.Font = UI_CONFIG.Font
-        logoNotificationLabel.TextSize = 12
-        logoNotificationLabel.TextWrapped = true
-    end)
-
-    -- If GitHub version also loads successfully, prioritize it
-    if gitSuccess then
-        logoNotificationLabel.Text = "✅ Logo loaded: GitHub Raw URL (Preferred)"
-        logoNotificationLabel.Font = UI_CONFIG.Font
-        logoNotificationLabel.TextSize = 12
-        logoNotificationLabel.TextWrapped = true
-    end
+if gitSuccess then
+    -- If GitHub URL loads successfully, update notification
+    logoNotificationLabel.Text = "✅ Logo loaded: GitHub Raw URL (Preferred)"
+    logoNotificationLabel.Font = UI_CONFIG.Font
+    logoNotificationLabel.TextSize = 12
+    logoNotificationLabel.TextWrapped = true
 else
-    -- If default asset fails, try GitHub URL
-    logoNotificationLabel.Text = "⚠️ Default asset failed, trying GitHub URL..."
+    -- If GitHub URL fails, try default Roblox asset
+    logoNotificationLabel.Text = "⚠️ GitHub URL failed, trying default asset..."
     logoNotificationLabel.Font = UI_CONFIG.Font
     logoNotificationLabel.TextSize = 12
     logoNotificationLabel.TextWrapped = true
 
     wait(1) -- Pause to allow user to see the status
 
-    local urlSuccess, urlErrorMessage = pcall(function()
-        logoIcon.Image = "https://raw.githubusercontent.com/Bloxhouse/bloxhouse-fishit-gifting-script/refs/heads/main/logo_seamless.png"
-        logoNotificationLabel.Text = "✅ Logo loaded: GitHub Raw URL"
+    local success, errorMessage = pcall(function()
+        logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as fallback
+        logoNotificationLabel.Text = "✅ Logo loaded: Default Roblox Asset"
         logoNotificationLabel.Font = UI_CONFIG.Font
         logoNotificationLabel.TextSize = 12
         logoNotificationLabel.TextWrapped = true
     end)
 
-    -- If GitHub URL also fails, use backup
-    if not urlSuccess then
-        -- Try another default asset as backup
+    if not success then
+        -- If default asset also fails, try backup
+        logoNotificationLabel.Text = "⚠️ Default asset failed, using backup..."
+        logoNotificationLabel.Font = UI_CONFIG.Font
+        logoNotificationLabel.TextSize = 12
+        logoNotificationLabel.TextWrapped = true
+
+        wait(1) -- Pause to show status
+
         local backupSuccess, backupError = pcall(function()
             logoIcon.Image = "rbxassetid://6035062920"  -- Backup circle icon
             logoNotificationLabel.Text = "✅ Logo loaded: Backup Asset"
@@ -294,22 +288,13 @@ else
         end)
 
         if not backupSuccess then
+            -- Ultimate fallback to ensure something shows
             logoNotificationLabel.Text = "❌ All logo attempts failed - using Roblox default"
             logoNotificationLabel.Font = UI_CONFIG.Font
             logoNotificationLabel.TextSize = 12
             logoNotificationLabel.TextWrapped = true
             logoIcon.Image = "rbxassetid://6034842695"  -- Ultimate fallback
-        else
-            logoNotificationLabel.Text = "✅ Successfully loaded: Backup Asset"
-            logoNotificationLabel.Font = UI_CONFIG.Font
-            logoNotificationLabel.TextSize = 12
-            logoNotificationLabel.TextWrapped = true
         end
-    else
-        logoNotificationLabel.Text = "✅ Successfully loaded: GitHub Raw URL"
-        logoNotificationLabel.Font = UI_CONFIG.Font
-        logoNotificationLabel.TextSize = 12
-        logoNotificationLabel.TextWrapped = true
     end
 end
 
