@@ -206,6 +206,7 @@ logoIcon.Position = UDim2.new(0.5, -12, 0.5, -12)
 logoIcon.BackgroundTransparency = 1
 logoIcon.Image = "rbxassetid://76444088503397"  -- Provided asset ID
 logoIcon.ImageColor3 = UI_CONFIG.PrimaryColor
+logoIcon.ScaleType = Enum.ScaleType.Fit
 logoIcon.Parent = logoCircle
 
 -- Title with gradient effect
