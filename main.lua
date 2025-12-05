@@ -208,23 +208,69 @@ logoIcon.ImageColor3 = UI_CONFIG.PrimaryColor
 logoIcon.ScaleType = Enum.ScaleType.Fit
 logoIcon.Parent = logoCircle
 
--- Attempt to set the image and handle failure gracefully
+-- Notification Frame
+local notificationFrame = Instance.new("Frame")
+notificationFrame.Size = UDim2.new(0, 300, 0, 50)
+notificationFrame.Position = UDim2.new(0.5, -150, 0, -60)
+notificationFrame.BackgroundColor3 = UI_CONFIG.TextColor
+notificationFrame.BackgroundTransparency = 0.9
+notificationFrame.BorderSizePixel = 0
+notificationFrame.ZIndex = 10
+notificationFrame.Parent = mainContainer
+local notificationCorner = Instance.new("UICorner")
+notificationCorner.CornerRadius = UDim.new(0, 8)
+notificationCorner.Parent = notificationFrame
+
+local notificationLabel = Instance.new("TextLabel")
+notificationLabel.Size = UDim2.new(1, 0, 1, 0)
+notificationLabel.BackgroundTransparency = 1
+notificationLabel.Text = ""
+notificationLabel.TextColor3 = UI_CONFIG.PrimaryColor
+notificationLabel.TextSize = 14
+notificationLabel.Font = UI_CONFIG.Font
+notificationLabel.ZIndex = 10
+notificationLabel.Parent = notificationFrame
+
+-- Attempt to set the image and handle failure gracefully with notifications
 local success, errorMessage = pcall(function()
     logoIcon.Image = "@logo_seamless.png"  -- Provided local asset reference
+    notificationLabel.Text = "✅ Logo loaded: @logo_seamless.png"
 end)
 
--- If image fails to load, use a default Roblox asset
+-- If first attempt fails, try GitHub URL
 if not success then
-    -- Try alternative URL format if GitHub URL is accessible
+    -- Update notification
+    notificationLabel.Text = "⚠️ Local asset failed, trying GitHub URL..."
+
     local urlSuccess, urlErrorMessage = pcall(function()
         logoIcon.Image = "https://raw.githubusercontent.com/Bloxhouse/bloxhouse-fishit-gifting-script/refs/heads/main/logo_seamless.png"
+        notificationLabel.Text = "✅ Logo loaded: GitHub URL"
     end)
 
     -- If GitHub URL also fails, use default fallback
     if not urlSuccess then
-        logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as fallback
+        notificationLabel.Text = "⚠️ GitHub URL failed, using default..."
+
+        local defaultSuccess, defaultError = pcall(function()
+            logoIcon.Image = "rbxassetid://6034842695"  -- Default circle icon as fallback
+            notificationLabel.Text = "✅ Logo loaded: Default asset"
+        end)
+
+        if not defaultSuccess then
+            notificationLabel.Text = "❌ All logo attempts failed"
+        end
     end
 end
+
+-- Auto-hide notification after 5 seconds
+spawn(function()
+    wait(5)
+    TweenService:Create(notificationFrame, TweenInfo.new(0.5), {
+        Position = UDim2.new(0.5, -150, 0, -60)
+    }):Play()
+    wait(0.5)
+    notificationFrame:Destroy()
+end)
 
 -- Title with gradient effect
 local titleLabel = Instance.new("TextLabel")
